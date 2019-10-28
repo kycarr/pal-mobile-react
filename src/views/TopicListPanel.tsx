@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { CommonProps, Component, Styles, View, Text, ScrollView } from 'reactxp';
-import { VirtualListView, VirtualListViewItemInfo } from 'reactxp-virtuallistview';
-import { VirtualListCellRenderDetails } from 'reactxp-virtuallistview/dist/VirtualListCell';
+import { Component, Styles, View, Text, ScrollView } from 'reactxp';
 
 import { Topic } from '../models/Topic';
 
-interface TopicListPanelProps extends CommonProps {
+interface TopicListState {
+    topics: Topic[];
 }
 
 const styles = {
@@ -17,30 +16,29 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center'
     }),
-    helloWorld: Styles.createTextStyle({
-        fontSize: 48,
-        fontWeight: 'bold',
-        marginBottom: 28
-    }),
 };
 
-export class TopicListPanel extends Component {
-    public state = {
-        topics: ["test"],
-    };
+export class TopicListPanel extends Component<void, TopicListState> {
 
-    constructor(props: TopicListPanelProps) {
+    constructor(props: any) {
         super(props);
+        this.state = {
+            topics: []
+        };
     }
 
     public async componentWillMount() {
-        // const req = await fetch(`https://jsonplaceholder.typicode.com/users`);
+        var req = await fetch(`http://localhost:3001/api/topics`);
+        var json = await req.json();
+        var topics = [];
+        for (var i in json) {
+            let topic: Topic = json[i] as Topic;
+            topics.push(topic);
+        }
 
-        // const data = await req.json();
-
-        // this.setState({
-        //     users: data,
-        // });
+        this.setState({
+            topics: topics,
+        });
     }
 
     render() {
@@ -48,9 +46,6 @@ export class TopicListPanel extends Component {
             <View useSafeInsets={true}>
                 <ScrollView style={styles.scroll}>
                     <View style={styles.container}>
-                        <Text style={styles.helloWorld}>
-                            test
-                        </Text>
                         {this.displayTopics(this.state.topics)}
                     </View>
                 </ScrollView>
@@ -58,10 +53,10 @@ export class TopicListPanel extends Component {
         );
     }
 
-    private displayTopics = (topics: string[]) => {
-        return topics.map((topic: string) => (
-            <View key={topic}>
-                {topic}
+    private displayTopics = (topics: Topic[]) => {
+        return topics.map((topic: Topic) => (
+            <View key={topic.id}>
+                {topic.name}
             </View>
         ))
     }
