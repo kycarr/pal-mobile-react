@@ -53,10 +53,11 @@ export class TopicListPanel extends Component<void, TopicListState> {
     public async componentWillMount() {
         var req = await fetch(`http://localhost:3001/api/topics`);
         var json = await req.json();
+        var data = json.data;
 
         var topics = [];
-        for (var i in json) {
-            let topic: Topic = json[i] as Topic;
+        for (var i in data) {
+            let topic: Topic = data[i] as Topic;
             topics.push(topic);
         }
 
@@ -95,8 +96,8 @@ export class TopicListPanel extends Component<void, TopicListState> {
                     <Text>alias:</Text>
                     <Text>createdAt:</Text>
                     <Text>updatedAt:</Text>
-                    <Text>prerequisiteTopics:</Text>
-                    <Text>knowledgeComponents:</Text>
+                    {this.displayPrereqsHeader(topic)}
+                    {this.displayKCsHeader(topic)}
                 </View>
                 <View style={styles.column}>
                     <Text>{topic.name}</Text>
@@ -104,18 +105,64 @@ export class TopicListPanel extends Component<void, TopicListState> {
                     <Text>{topic.alias}</Text>
                     <Text>{topic.createdAt}</Text>
                     <Text>{topic.updatedAt}</Text>
-                    <ScrollView horizontal={true}>
-                        {topic.prerequisiteTopics.map((prereq: string) => (
-                            `${prereq}, `
-                        ))}
-                    </ScrollView>
-                    {topic.knowledgeComponents.map((kc: KnowledgeComponent) => (
-                        <Text>
-                            {`${kc.kc} ( relevance=${kc.relevance} )`}
-                        </Text>
-                    ))}
+                    {this.displayPrereqs(topic)}
+                    {this.displayKCs(topic)}
                 </View>
             </View>
+        )
+    }
+
+    private displayPrereqsHeader = (topic: Topic) => {
+        const items = []
+        for (const [index, value] of topic.prerequisiteTopics.entries()) {
+            if (index != 0) {
+                items.push(<Text> </Text>)
+            }
+        }
+        return (
+            <View>
+                <Text>prerequisiteTopics:</Text>
+                {items}
+            </View>
+        )
+    }
+
+    private displayPrereqs = (topic: Topic) => {
+        if (topic.prerequisiteTopics.length == 0) {
+            return <Text>n/a</Text>
+        }
+        return (
+            topic.prerequisiteTopics.map((prereq: string) => (
+                <Text>{prereq}</Text>
+            ))
+        )
+    }
+
+    private displayKCsHeader = (topic: Topic) => {
+        const items = []
+        for (const [index, value] of topic.knowledgeComponents.entries()) {
+            if (index != 0) {
+                items.push(<Text> </Text>)
+            }
+        }
+        return (
+            <View>
+                <Text>knowledgeComponents:</Text>
+                {items}
+            </View>
+        )
+    }
+
+    private displayKCs = (topic: Topic) => {
+        if (topic.knowledgeComponents.length == 0) {
+            return <Text>n/a</Text>
+        }
+        return (
+            topic.knowledgeComponents.map((kc: KnowledgeComponent) => (
+                <Text>
+                    {`${kc.kc}, relevance=${kc.relevance}`}
+                </Text>
+            ))
         )
     }
 }
