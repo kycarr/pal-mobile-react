@@ -5,8 +5,9 @@ import Navigator, { NavigatorDelegateSelector as DelegateSelector, Types } from 
 import { TopicListPanel } from './TopicListPanel';
 
 enum NavigationRouteId {
-    MainPanel,
-    SecondPanel
+    Goals,
+    Topics,
+    Lessons,
 }
 
 const styles = {
@@ -21,7 +22,7 @@ export class RootView extends RX.Component<RX.CommonProps, RX.Stateless> {
     componentDidMount() {
         if (this._navigator) {
             this._navigator.immediatelyResetRouteStack([{
-                routeId: NavigationRouteId.MainPanel,
+                routeId: NavigationRouteId.Topics,
                 sceneConfigType: Types.NavigatorSceneConfigType.Fade
             }]);
         }
@@ -44,12 +45,15 @@ export class RootView extends RX.Component<RX.CommonProps, RX.Stateless> {
 
     private _renderScene = (navigatorRoute: Types.NavigatorRoute) => {
         switch (navigatorRoute.routeId) {
-            case NavigationRouteId.MainPanel:
+            case NavigationRouteId.Topics:
                 return (
                     <TopicListPanel />
                 );
+            case NavigationRouteId.Lessons:
+                return (
+                    <LessonListPanel />
+                )
         }
-
         return null;
     }
 }
